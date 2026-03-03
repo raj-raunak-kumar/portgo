@@ -57,23 +57,23 @@ const ContactSection = () => {
 
     return (
         <SectionWrapper title="Contact" subtitle="Collaboration and Communication" color={ALIENS.CONTACT.color}>
-            <div className="grid md:grid-cols-2 gap-12 items-center py-8">
+            <div className="grid md:grid-cols-2 gap-7 sm:gap-9 md:gap-12 items-center py-3 sm:py-5 md:py-8">
                 <div className="text-center md:text-left">
-                    <div className="w-32 h-32 mx-auto md:mx-0 rounded-full flex items-center justify-center mb-8 border animate-pulse" style={{ backgroundColor: `${modeColor}1A`, borderColor: `${modeColor}4D` }}>
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto md:mx-0 rounded-full flex items-center justify-center mb-5 sm:mb-6 md:mb-8 border animate-pulse" style={{ backgroundColor: `${modeColor}1A`, borderColor: `${modeColor}4D` }}>
                         <SatelliteDish className="text-4xl" style={{ color: modeColor }} />
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-4">Open to research collaboration</h3>
-                    <p className="text-gray-400 text-lg mb-8">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Open to research collaboration</h3>
+                    <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-5 sm:mb-6 md:mb-8">
                         I welcome discussions on research collaborations, academic opportunities, and systems engineering projects.
                     </p>
-                    <div className="flex justify-center md:justify-start gap-4">
-                        <a href="https://www.linkedin.com/in/raj-raunak-kumar-5a4843239/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile" className="p-3 bg-gray-800 text-white rounded-full w-14 h-14 flex items-center justify-center hover:bg-destructive hover:text-white transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,51,0,0.3)]"><Linkedin className="text-xl" /></a>
-                        <a href="https://github.com/RajRaunak" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile" className="p-3 bg-gray-800 text-white rounded-full w-14 h-14 flex items-center justify-center hover:bg-destructive hover:text-white transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,51,0,0.3)]"><Github className="text-xl" /></a>
+                    <div className="flex justify-center md:justify-start gap-3 sm:gap-4">
+                        <a href="https://www.linkedin.com/in/raj-raunak-kumar-5a4843239/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile" className="p-3 bg-gray-800 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:bg-destructive hover:text-white transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,51,0,0.3)]"><Linkedin className="text-lg sm:text-xl" /></a>
+                        <a href="https://github.com/RajRaunak" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile" className="p-3 bg-gray-800 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:bg-destructive hover:text-white transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,51,0,0.3)]"><Github className="text-lg sm:text-xl" /></a>
                     </div>
                 </div>
-                <div className="p-8 bg-black/50 border border-white/10 rounded-xl backdrop-blur-sm">
+                <div className="p-4 sm:p-6 md:p-8 bg-black/50 border border-white/10 rounded-xl backdrop-blur-sm">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5 md:space-y-6">
                             <FormField
                                 control={form.control}
                                 name="email"

@@ -14,13 +14,20 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
 
     let animationFrameId: number;
     let particles: Particle[] = [];
+    let particleCount = 60;
+    let linkDistance = 100;
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resize = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+
+      const isMobile = window.innerWidth < 768;
+      const reducedMotion = reducedMotionQuery.matches;
+      particleCount = reducedMotion ? 16 : isMobile ? 28 : 60;
+      linkDistance = reducedMotion ? 55 : isMobile ? 72 : 100;
+      init();
     };
-    window.addEventListener('resize', resize);
-    resize();
 
     class Particle {
       x: number;
@@ -61,9 +68,16 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
 
     const init = () => {
       particles = [];
-      for (let i = 0; i < 60; i++) particles.push(new Particle());
+      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
     };
-    init();
+
+    window.addEventListener('resize', resize);
+    if (typeof reducedMotionQuery.addEventListener === 'function') {
+      reducedMotionQuery.addEventListener('change', resize);
+    } else {
+      reducedMotionQuery.addListener(resize);
+    }
+    resize();
     
     const animate = () => {
       if(!ctx || !canvas) return;
@@ -78,8 +92,8 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < 100) {
-            ctx.globalAlpha = (100 - distance) / 1600;
+          if (distance < linkDistance) {
+            ctx.globalAlpha = (linkDistance - distance) / (linkDistance * 16);
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -94,6 +108,11 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
 
     return () => {
       window.removeEventListener('resize', resize);
+      if (typeof reducedMotionQuery.removeEventListener === 'function') {
+        reducedMotionQuery.removeEventListener('change', resize);
+      } else {
+        reducedMotionQuery.removeListener(resize);
+      }
       cancelAnimationFrame(animationFrameId);
     };
   }, [activeColor]);

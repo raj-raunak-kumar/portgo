@@ -25,16 +25,16 @@ const ProjectCard = ({ project, onClick, index = 0 }: { project: Project, onClic
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6, delay: index * 0.1, type: "spring", stiffness: 100 }}
             onClick={onClick}
-            className="group relative overflow-hidden flex flex-col justify-center rounded-2xl bg-slate-900/70 border border-white/10 hover:border-primary transition-all duration-300 hover:shadow-[0_0_16px_rgba(96,165,250,0.2)] transform hover:-translate-y-1 cursor-pointer aspect-square"
+            className="group relative overflow-hidden flex flex-col justify-center rounded-2xl bg-slate-900/70 border border-white/10 hover:border-primary transition-all duration-300 hover:shadow-[0_0_16px_rgba(96,165,250,0.2)] transform hover:-translate-y-1 cursor-pointer min-h-[210px] sm:min-h-[240px] md:aspect-square"
         >
             <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="p-8 relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                    <Icon className="text-2xl text-primary" />
+            <div className="p-5 sm:p-6 md:p-8 relative z-10">
+                <div className="flex justify-between items-start mb-3 sm:mb-4">
+                    <Icon className="text-xl sm:text-2xl text-primary" />
                     {project.ghLink && <a href={project.ghLink} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}><Github className="text-gray-500 hover:text-white cursor-pointer text-xl" /></a>}
                 </div>
-                <h4 className="text-2xl font-bold text-white mb-2">{project.title}</h4>
-                <p className="text-gray-400 mb-6 text-sm leading-relaxed">
+                <h4 className="text-xl sm:text-2xl font-bold text-white mb-2">{project.title}</h4>
+                <p className="text-gray-400 mb-4 sm:mb-6 text-sm leading-relaxed">
                     {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 text-xs font-mono text-primary">
@@ -79,8 +79,8 @@ const TechSection = () => {
     return (
         <>
             <SectionWrapper title="Technical Work" subtitle="Systems and Engineering Expertise" color={ALIENS.TECH_SKILLS.color}>
-                <div className="space-y-12 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-8 sm:space-y-10 md:space-y-12 pt-2 sm:pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                         <TechCard
                             title="Languages"
                             iconName="Code"
@@ -102,10 +102,10 @@ const TechSection = () => {
                     </div>
 
                     <div>
-                        <h3 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
+                        <h3 className="text-2xl sm:text-3xl font-bold text-white mb-5 sm:mb-8 flex items-center gap-3">
                             <Cpu style={{ color: modeColor }} /> Selected Projects
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                             {projects.map((p, i) => <ProjectCard key={i} project={p} onClick={() => setSelectedProject(p)} index={i} />)}
                         </div>
                     </div>

@@ -27,18 +27,18 @@ const TechCard = ({ title, items, iconName, description, delay = 0 }: TechCardPr
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6, delay, type: "spring", stiffness: 100 }}
-            className="bg-slate-900/60 backdrop-blur-md border border-white/10 p-8 aspect-square flex flex-col justify-center rounded-2xl hover:border-primary transition-all group duration-300 hover:shadow-[0_0_16px_rgba(96,165,250,0.12)] transform hover:-translate-y-1"
+            className="bg-slate-900/60 backdrop-blur-md border border-white/10 p-5 sm:p-6 md:p-8 md:aspect-square flex flex-col justify-center rounded-2xl hover:border-primary transition-all group duration-300 hover:shadow-[0_0_16px_rgba(96,165,250,0.12)] transform hover:-translate-y-1"
         >
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                 <div className="p-2 rounded bg-primary/10 text-primary">
-                    <Icon className="w-6 h-6" />
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <h3 className="font-headline font-bold text-xl tracking-wider">{title}</h3>
+                <h3 className="font-headline font-bold text-lg sm:text-xl tracking-wider">{title}</h3>
             </div>
             {description && <p className="text-gray-400 text-sm mb-6 leading-relaxed bg-clip-text font-medium">{description}</p>}
             <div className="flex flex-wrap gap-2">
                 {items.map((item) => (
-                    <span key={item} className="px-3 py-1 text-sm border border-white/20 rounded-full text-gray-300 hover:text-primary hover:border-primary transition-colors cursor-default">
+                    <span key={item} className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm border border-white/20 rounded-full text-gray-300 hover:text-primary hover:border-primary transition-colors cursor-default">
                         {item}
                     </span>
                 ))}

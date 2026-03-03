@@ -18,8 +18,8 @@ const TimelineSection = () => {
 
     return (
         <SectionWrapper title="Timeline" subtitle="Academic Journey" color={ALIENS.TIMELINE.color}>
-            <div className="relative py-10 overflow-hidden">
-                <div className="absolute left-1/2 -translate-x-1/2 h-full w-px bg-gradient-to-b from-[#22d3ee] to-transparent"></div>
+            <div className="relative py-4 sm:py-6 md:py-10 overflow-hidden">
+                <div className="absolute left-[14px] sm:left-[16px] md:left-1/2 md:-translate-x-1/2 h-full w-px bg-gradient-to-b from-[#22d3ee] to-transparent"></div>
 
                 {timelineItems.map((item, index) => (
                     <motion.div
@@ -28,17 +28,17 @@ const TimelineSection = () => {
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ duration: 0.6, delay: index * 0.1, type: "spring", stiffness: 100 }}
                         key={index}
-                        className={`flex items-center w-full mb-12 flex-row ${item.side === 'right' ? 'flex-row-reverse' : ''}`}
+                        className={`relative flex items-start md:items-center w-full mb-5 sm:mb-6 md:mb-12 pl-9 sm:pl-10 md:pl-0 flex-row ${item.side === 'right' ? 'md:flex-row-reverse' : 'md:flex-row'}`}
                     >
-                        <div className="w-5/12"></div>
-                        <div className="w-2/12 flex justify-center relative">
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: modeColor }}></div>
+                        <div className="hidden md:block w-5/12"></div>
+                        <div className="absolute left-[8px] sm:left-[10px] top-4 md:static md:w-2/12 md:flex md:justify-center">
+                            <div className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full" style={{ backgroundColor: modeColor }}></div>
                         </div>
-                        <div className={`w-5/12 flex items-center ${item.side === 'left' ? 'justify-start' : 'justify-end'}`}>
-                            <div className={`p-4 md:p-6 bg-slate-900/60 border rounded-2xl hover:bg-opacity-10 transition-all duration-300 w-full max-w-[260px] transform hover:scale-[1.02] hover:shadow-[0_0_14px_rgba(34,211,238,0.15)] aspect-square flex flex-col justify-center ${item.side === 'left' ? 'text-right items-end' : 'text-left items-start'}`} style={{ borderColor: `${modeColor}4D`, background: `rgba(34, 211, 238, 0.05)` }}>
-                                <h3 className="text-sm md:text-xl font-bold font-mono mb-1" style={{ color: modeColor }}>{item.year}</h3>
-                                <h4 className="text-white text-xs md:text-base font-bold mb-1 md:mb-2 leading-snug">{item.title}</h4>
-                                <p className="text-gray-400 text-[9px] md:text-xs mt-1 md:mt-2 leading-relaxed">{item.desc}</p>
+                        <div className={`w-full md:w-5/12 flex items-center ${item.side === 'left' ? 'md:justify-start' : 'md:justify-end'}`}>
+                            <div className={`p-4 sm:p-5 md:p-6 bg-slate-900/60 border rounded-2xl hover:bg-opacity-10 transition-all duration-300 w-full md:max-w-[280px] transform md:hover:scale-[1.02] hover:shadow-[0_0_14px_rgba(34,211,238,0.15)] md:aspect-square flex flex-col justify-center text-left ${item.side === 'left' ? 'md:text-right md:items-end' : 'md:text-left md:items-start'}`} style={{ borderColor: `${modeColor}4D`, background: `rgba(34, 211, 238, 0.05)` }}>
+                                <h3 className="text-sm sm:text-base md:text-xl font-bold font-mono mb-1" style={{ color: modeColor }}>{item.year}</h3>
+                                <h4 className="text-white text-sm sm:text-base font-bold mb-1 md:mb-2 leading-snug">{item.title}</h4>
+                                <p className="text-gray-400 text-xs sm:text-sm md:text-xs mt-1 md:mt-2 leading-relaxed">{item.desc}</p>
                             </div>
                         </div>
                     </motion.div>

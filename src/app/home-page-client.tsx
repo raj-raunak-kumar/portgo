@@ -51,7 +51,7 @@ export default function HomePageClient() {
   const isHero = mode.id === 'HUMAN';
 
   return (
-    <div className={`${isHero ? 'h-screen overflow-hidden' : 'min-h-screen overflow-x-hidden'} bg-background text-foreground font-sans`}>
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground font-sans">
       <EnergyBackground activeColor={mode.color} />
 
       {showHeader ? (
@@ -90,17 +90,17 @@ export default function HomePageClient() {
             <div className="flex items-center gap-3">
               <Link
                 href="/blog"
-                className="pointer-events-auto px-5 py-2 bg-slate-900/70 backdrop-blur border border-primary/50 text-primary rounded-md hover:bg-slate-900 transition-all font-semibold tracking-wide text-sm animate-fadeIn"
+                className="pointer-events-auto px-4 py-2 bg-slate-900/70 backdrop-blur border border-primary/45 text-primary rounded-md hover:bg-slate-900 hover:border-primary/70 transition-all font-semibold tracking-[0.08em] text-[11px] uppercase animate-fadeIn"
                 style={{ animationDelay: '0.3s' }}
               >
                 Blog
               </Link>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="pointer-events-auto px-5 py-2 bg-slate-900/70 backdrop-blur border border-white/20 text-white rounded-md hover:bg-slate-900 hover:border-primary transition-all font-semibold tracking-wide text-sm animate-fadeIn"
+                className="pointer-events-auto px-4 py-2 bg-slate-900/70 backdrop-blur border border-white/25 text-white rounded-md hover:bg-slate-900 hover:border-primary transition-all font-semibold tracking-[0.08em] text-[11px] uppercase animate-fadeIn"
                 style={{ animationDelay: '0.3s' }}
               >
-                Menu
+                Main Menu
               </button>
             </div>
           )}
@@ -108,8 +108,8 @@ export default function HomePageClient() {
       )}
 
       {isMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center animate-fadeIn">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto p-4">
+        <div className="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center md:justify-center animate-fadeIn overflow-y-auto py-20 md:py-0">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto p-4">
             {Object.values(ALIENS).map((alien) => {
               const Icon = alien.icon;
               return (
@@ -135,20 +135,20 @@ export default function HomePageClient() {
         </div>
       )}
 
-      <div className="fixed top-6 right-6 z-40 md:hidden pointer-events-none">
+      <div className="fixed top-4 right-3 z-40 md:hidden pointer-events-none">
         <Link
           href="/blog"
-          className="pointer-events-auto px-4 py-1.5 bg-slate-900/80 backdrop-blur border border-primary/50 text-primary rounded-full hover:bg-slate-900 transition-all font-semibold tracking-wide text-[10px]"
+          className="pointer-events-auto px-3 py-1.5 bg-slate-900/80 backdrop-blur border border-primary/50 text-primary rounded-full hover:bg-slate-900 transition-all font-semibold tracking-wide text-[10px]"
         >
           Blog
         </Link>
       </div>
 
-      <main ref={mainRef} className={`relative block ${isHero ? 'h-full flex-col overflow-hidden pt-4 md:pt-24 pb-10' : 'min-h-screen pt-8 md:pt-24 pb-10'}`}>
+      <main ref={mainRef} className={`relative block ${isHero ? 'min-h-[100svh] pt-14 md:pt-24 pb-28 md:pb-10' : 'min-h-screen pt-8 md:pt-24 pb-24 md:pb-10'}`}>
         {isMounted && renderContent()}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 h-16 bg-slate-950/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-50 md:hidden pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 h-[68px] bg-slate-950/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-50 md:hidden pb-[env(safe-area-inset-bottom)]">
         {Object.values(ALIENS).map((alien) => {
           const NavIcon = alien.icon;
           const isActive = mode.id === alien.id;

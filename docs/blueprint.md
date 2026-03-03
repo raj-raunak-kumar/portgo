@@ -8,6 +8,11 @@
 
 ## Style Guidelines:
 
+## Design Philosophy
+
+The design embodies a futuristic, tech-forward aesthetic inspired by the Ben 10 Omnitrix device, creating an immersive and interactive portfolio experience.
+
+
 - Primary color: Ben 10 Green (#39FF14) for UI highlights, accents, and Omnitrix-related elements.
 - Background color: Dark Green (#006400), a desaturated, darker shade of the primary color to set the appropriate mood.
 - Accent color: Electric Lime (#CCFF00). Used to denote interactive elements such as hover states on buttons.
