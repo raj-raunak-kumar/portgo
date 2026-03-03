@@ -1,0 +1,66 @@
+--- src/components/omnitrix-3d.tsx
++++ src/components/omnitrix-3d.tsx
+@@ -58,8 +58,8 @@
+         <group scale={0.78} position={[0, 0, 0.12]}>
+-            {/* Slash \ */}
+-            <group rotation={[0, 0, Math.PI / 6]}>
++            {/* Slash / */}
++            <group rotation={[0, 0, -Math.PI / 6]}>
+                 {createArm([thickness, slashLength, depth])}
+             </group>
+ 
+@@ -112,24 +112,25 @@
+             {/* Transparent Glass Cube with Glowing Edges */}
+             <group ref={cubeRef}>
+                 <mesh>
+                     <boxGeometry args={[2.2, 2.2, 2.2]} />
+                     <meshPhysicalMaterial
+                         color={color}
+                         transparent
+-                        opacity={0.08}
+-                        roughness={0.05}
+-                        metalness={0}
+-                        transmission={1}
+-                        ior={1.32}
+-                        clearcoat={1}
+-                        clearcoatRoughness={0.04}
++                        opacity={0.15}
++                        roughness={0.1}
++                        metalness={0.2}
++                        transmission={0.95}
++                        ior={1.45}
++                        clearcoat={1.0}
++                        clearcoatRoughness={0.0}
+                         emissive={color}
+-                        emissiveIntensity={0.1}
++                        emissiveIntensity={0.05}
++                        thickness={2.5}
++                        side={THREE.DoubleSide}
+                     />
+                 </mesh>
+ 
+                 <lineSegments>
+-                    <edgesGeometry args={[new THREE.BoxGeometry(2.24, 2.24, 2.24)]} />
+-                    <lineBasicMaterial color={color} toneMapped={false} transparent opacity={0.6} />
++                    <edgesGeometry args={[new THREE.BoxGeometry(2.21, 2.21, 2.21)]} />
++                    <lineBasicMaterial color={color} toneMapped={false} transparent opacity={0.25} />
+                 </lineSegments>
+             </group>
+ 
+-            {/* Inner Glowing Code Symbol < \ > */}
+-            <CodeSymbol color={color} />
++            <pointLight position={[0, 0, 0]} intensity={4.0} distance={4} color={color} decay={1.5} />
++            <pointLight position={[0, 0, 0]} intensity={2.0} distance={2.5} color="#ffffff" decay={2} />
++            <group scale={1.1}>
++                <CodeSymbol color={color} />
++            </group>
+         </group>
+     );
+@@ -167,7 +168,7 @@
+                         luminanceSmoothing={0.9}
+                         height={300}
+                         opacity={1.5}
+-                        intensity={2.0} // Control the intensity of the neon glow
++                        intensity={3.0} // Control the intensity of the neon glow
+                     />
+                 </EffectComposer>
