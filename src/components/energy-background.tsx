@@ -16,6 +16,7 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
     let particles: Particle[] = [];
     let particleCount = 60;
     let linkDistance = 100;
+    let isAnimating = true;
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resize = () => {
@@ -24,8 +25,8 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
 
       const isMobile = window.innerWidth < 768;
       const reducedMotion = reducedMotionQuery.matches;
-      particleCount = reducedMotion ? 16 : isMobile ? 28 : 60;
-      linkDistance = reducedMotion ? 55 : isMobile ? 72 : 100;
+      particleCount = reducedMotion ? 10 : isMobile ? 16 : 54;
+      linkDistance = reducedMotion ? 44 : isMobile ? 56 : 96;
       init();
     };
 
@@ -42,8 +43,10 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.size = Math.random() * 2;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
+        const isMobile = window.innerWidth < 768;
+        const speedScale = isMobile ? 0.34 : 0.5;
+        this.speedX = (Math.random() - 0.5) * speedScale;
+        this.speedY = (Math.random() - 0.5) * speedScale;
         this.opacity = Math.random() * 0.5;
       }
       update() {
@@ -81,18 +84,24 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
     
     const animate = () => {
       if(!ctx || !canvas) return;
+      if (!isAnimating) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       ctx.strokeStyle = activeColor || THEME.green;
       ctx.lineWidth = 0.35;
+      const linkDistanceSq = linkDistance * linkDistance;
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw();
         for (let j = i; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < linkDistance) {
+          const distanceSq = dx * dx + dy * dy;
+          if (distanceSq < linkDistanceSq) {
+            const distance = Math.sqrt(distanceSq);
             ctx.globalAlpha = (linkDistance - distance) / (linkDistance * 16);
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -104,7 +113,12 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
       animationFrameId = requestAnimationFrame(animate);
     };
 
+    const onVisibilityChange = () => {
+      isAnimating = !document.hidden;
+    };
+
     animate();
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
       window.removeEventListener('resize', resize);
@@ -113,6 +127,7 @@ const EnergyBackground = ({ activeColor }: { activeColor: string }) => {
       } else {
         reducedMotionQuery.removeListener(resize);
       }
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, [activeColor]);

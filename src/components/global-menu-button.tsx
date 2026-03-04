@@ -38,7 +38,7 @@ export default function GlobalMenuButton() {
 
       {isMenuOpen && (
         <div
-          className="fixed inset-0 z-[70] bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center animate-fadeIn overflow-y-auto py-20"
+          className="fixed inset-0 z-[70] bg-slate-950/95 backdrop-blur-sm md:backdrop-blur-lg flex flex-col items-center justify-center animate-fadeIn overflow-y-auto py-20"
           onClick={() => setIsMenuOpen(false)}
         >
           <div

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ALIENS, Alien } from '@/lib/constants';
 import HeroSection from '@/components/sections/hero-section';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const EnergyBackground = dynamic(() => import('@/components/energy-background'), { ssr: false });
 const ChatbotWidget = dynamic(
@@ -17,6 +18,7 @@ const TimelineSection = dynamic(() => import('@/components/sections/timeline-sec
 const ContactSection = dynamic(() => import('@/components/sections/contact-section'));
 
 export default function HomePageClient() {
+  const isMobile = useIsMobile();
   const [mode, setMode] = useState<Alien>(ALIENS.HUMAN);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -78,7 +80,14 @@ export default function HomePageClient() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground font-sans">
-      <EnergyBackground activeColor={mode.color} />
+      {isMobile ? (
+        <div
+          className="fixed inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at top, ${mode.color}26 0%, transparent 58%)` }}
+        />
+      ) : (
+        <EnergyBackground activeColor={mode.color} />
+      )}
 
       {showHeader ? (
         <div className="absolute top-0 left-0 w-full p-6 hidden md:flex justify-between items-center z-50 pointer-events-none">
@@ -134,7 +143,7 @@ export default function HomePageClient() {
       )}
 
       {isMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center md:justify-center animate-fadeIn overflow-y-auto py-20 md:py-0">
+        <div className="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-sm md:backdrop-blur-lg flex flex-col items-center justify-center md:justify-center animate-fadeIn overflow-y-auto py-20 md:py-0">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto p-4">
             {Object.values(ALIENS).map((alien) => {
               const Icon = alien.icon;
@@ -174,7 +183,7 @@ export default function HomePageClient() {
         {isMounted && renderContent()}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 h-[68px] bg-slate-950/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-50 md:hidden pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 h-[68px] bg-slate-950/95 backdrop-blur-sm border-t border-white/10 flex items-center justify-around px-2 z-50 md:hidden pb-[env(safe-area-inset-bottom)]">
         {Object.values(ALIENS).map((alien) => {
           const NavIcon = alien.icon;
           const isActive = mode.id === alien.id;
