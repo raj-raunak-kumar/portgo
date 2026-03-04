@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 9002",
+    "convert:docx-posts": "node scripts/convert-docx-posts.mjs",
+    "prebuild": "npm run convert:docx-posts",
+    "build:netlify": "npm run convert:docx-posts && NODE_ENV=production next build",
     "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
@@ -41,6 +44,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "docx-preview": "^0.3.7",
     "embla-carousel-react": "^8.1.5",
     "firebase": "^10.14.1",
     "framer-motion": "^12.34.3",

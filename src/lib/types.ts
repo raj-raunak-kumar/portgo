@@ -3,7 +3,8 @@ export type BlogPost = {
     title: string;
     excerpt: string;
     content: string;
-    imageUrl: string;
+    contentMode?: 'rich' | 'raw-html';
+    imageUrl?: string;
     date: string;
     tags: string;
 };

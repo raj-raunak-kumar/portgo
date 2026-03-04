@@ -10,10 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Check, X, ShieldAlert, Mail, MailOpen } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Check, X, ShieldAlert, Mail, MailOpen, FileUp } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { ChatbotWidget } from '@/components/chatbot-widget';
 import { ContactMessage } from '@/lib/types';
+import { renderAsync } from 'docx-preview';
 import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false }) as any;
@@ -23,7 +24,8 @@ type BlogPost = {
     title: string;
     excerpt: string;
     content: string;
-    imageUrl: string;
+    contentMode?: 'rich' | 'raw-html';
+    imageUrl?: string;
     date: string;
     tags: string;
 };
@@ -46,10 +48,13 @@ export default function AdminDashboard() {
     const [title, setTitle] = useState('');
     const [excerpt, setExcerpt] = useState('');
     const [content, setContent] = useState('');
+    const [contentMode, setContentMode] = useState<'rich' | 'raw-html'>('rich');
     const [imageUrl, setImageUrl] = useState('');
     const [tags, setTags] = useState('');
+    const [isImportingDocx, setIsImportingDocx] = useState(false);
 
     const quillRef = useRef<any>(null);
+    const docxInputRef = useRef<HTMLInputElement>(null);
 
     const imageHandler = useCallback(() => {
         const input = document.createElement('input');
@@ -101,6 +106,49 @@ export default function AdminDashboard() {
             }
         }
     }), [imageHandler]);
+
+    const RAW_HTML_MARKER_ATTR = 'data-content-mode="raw-html"';
+
+    const hasRawHtmlMarker = useCallback((html: string) => {
+        return html.includes(RAW_HTML_MARKER_ATTR) || /data-content-mode=['"]raw-html['"]/i.test(html);
+    }, []);
+
+    const normalizeContentForSave = useCallback((value: string, mode: 'rich' | 'raw-html') => {
+        const rawWrapperRegex = /^\s*<div\s+data-content-mode=['"]raw-html['"]\s*>([\s\S]*)<\/div>\s*$/i;
+
+        if (mode === 'raw-html') {
+            if (hasRawHtmlMarker(value)) return value;
+            return `<div data-content-mode="raw-html">${value}</div>`;
+        }
+
+        const unwrapped = value.match(rawWrapperRegex);
+        return unwrapped ? unwrapped[1] : value;
+    }, [hasRawHtmlMarker]);
+
+    const uploadEmbeddedImagesFromHtml = useCallback(async (html: string) => {
+        const parser = new DOMParser();
+        const parsed = parser.parseFromString(html, 'text/html');
+        const images = Array.from(parsed.querySelectorAll('img'));
+
+        for (const img of images) {
+            const src = img.getAttribute('src') || '';
+            if (!src.startsWith('data:image/')) continue;
+
+            try {
+                const response = await fetch(src);
+                const blob = await response.blob();
+                const extension = (blob.type.split('/')[1] || 'png').split(';')[0];
+                const storageRef = ref(storage, `blog-docx-images/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`);
+                const snapshot = await uploadBytes(storageRef, blob, { contentType: blob.type || `image/${extension}` });
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                img.setAttribute('src', downloadURL);
+            } catch (uploadError) {
+                console.warn('Embedded image upload skipped, using original source:', uploadError);
+            }
+        }
+
+        return parsed.body.innerHTML;
+    }, []);
 
     // Protect Route
     useEffect(() => {
@@ -165,20 +213,59 @@ export default function AdminDashboard() {
         }
 
         try {
+            let normalizedContent = normalizeContentForSave(content, contentMode);
+
+            if (contentMode === 'raw-html') {
+                normalizedContent = await uploadEmbeddedImagesFromHtml(normalizedContent);
+            }
+
+            const contentSizeInBytes = new Blob([normalizedContent]).size;
+            if (contentSizeInBytes > 900000) {
+                throw new Error('Post content is too large to store. Reduce document size or images and try again.');
+            }
+
             const postData = {
                 title,
                 excerpt,
-                content,
+                content: normalizedContent,
+                contentMode,
+                imageUrl,
+                tags,
+                date: new Date().toISOString(),
+            };
+
+            const legacyPostData = {
+                title,
+                excerpt,
+                content: normalizedContent,
                 imageUrl,
                 tags,
                 date: new Date().toISOString(),
             };
 
             if (isEditing && currentId) {
-                await updateDoc(doc(db, "blogs", currentId), postData);
+                try {
+                    await updateDoc(doc(db, "blogs", currentId), postData);
+                } catch (error: any) {
+                    const errorMessage = String(error?.message || '').toLowerCase();
+                    if (errorMessage.includes('insufficient permissions') || errorMessage.includes('permission')) {
+                        await updateDoc(doc(db, "blogs", currentId), legacyPostData);
+                    } else {
+                        throw error;
+                    }
+                }
                 toast({ title: "Protocol Updated", description: "Blog post successfully modified." });
             } else {
-                await addDoc(collection(db, "blogs"), postData);
+                try {
+                    await addDoc(collection(db, "blogs"), postData);
+                } catch (error: any) {
+                    const errorMessage = String(error?.message || '').toLowerCase();
+                    if (errorMessage.includes('insufficient permissions') || errorMessage.includes('permission')) {
+                        await addDoc(collection(db, "blogs"), legacyPostData);
+                    } else {
+                        throw error;
+                    }
+                }
                 toast({ title: "Protocol Initiated", description: "New blog post published successfully.", className: "bg-black border-[#39ff14] text-[#39ff14]" });
             }
 
@@ -186,15 +273,66 @@ export default function AdminDashboard() {
             fetchPosts();
         } catch (error: any) {
             console.error("Save error:", error);
-            toast({ title: "System Error", description: "Failed to save the blog post.", variant: "destructive" });
+            toast({ title: "System Error", description: error?.message || "Failed to save the blog post.", variant: "destructive" });
+        }
+    };
+
+    const handleDocxImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.docx')) {
+            toast({ title: "Unsupported File", description: "Please upload a .docx file.", variant: "destructive" });
+            e.target.value = '';
+            return;
+        }
+
+        try {
+            setIsImportingDocx(true);
+            toast({ title: "Importing DOCX", description: "Converting document to web content..." });
+
+            const arrayBuffer = await file.arrayBuffer();
+            const tempContainer = document.createElement('div');
+
+            await renderAsync(arrayBuffer, tempContainer, undefined, {
+                inWrapper: false,
+                useBase64URL: true,
+            });
+
+            const importedHtml = tempContainer.innerHTML;
+            if (!importedHtml.trim()) {
+                throw new Error('No content was extracted from the DOCX file.');
+            }
+
+            setContent(normalizeContentForSave(importedHtml, 'raw-html'));
+            setContentMode('raw-html');
+            if (!excerpt.trim()) {
+                const textPreview = (tempContainer.textContent || '').replace(/\s+/g, ' ').trim();
+                setExcerpt(textPreview.slice(0, 200));
+            }
+
+            toast({
+                title: "DOCX Imported",
+                description: "Content and images were converted. Review formatting before publishing.",
+                className: "bg-black border-[#39ff14] text-[#39ff14]"
+            });
+        } catch (error) {
+            console.error('DOCX import failed:', error);
+            toast({ title: "Import Failed", description: "Could not convert this DOCX file.", variant: "destructive" });
+        } finally {
+            setIsImportingDocx(false);
+            e.target.value = '';
         }
     };
 
     const handleEdit = (post: BlogPost) => {
+        const inferredMode: 'rich' | 'raw-html' = post.contentMode || (hasRawHtmlMarker(post.content) ? 'raw-html' : 'rich');
+
         setTitle(post.title);
         setExcerpt(post.excerpt);
         setContent(post.content);
-        setImageUrl(post.imageUrl);
+        setContentMode(inferredMode);
+        setImageUrl(post.imageUrl || '');
         setTags(post.tags);
         setCurrentId(post.id);
         setIsEditing(true);
@@ -218,6 +356,7 @@ export default function AdminDashboard() {
         setTitle('');
         setExcerpt('');
         setContent('');
+        setContentMode('rich');
         setImageUrl('');
         setTags('');
         setIsEditing(false);
@@ -336,18 +475,57 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div className="space-y-2 text-white pb-12">
-                                    <label className="text-xs font-mono text-gray-500 uppercase tracking-wider">Content</label>
-                                    <div className="bg-white text-black rounded-lg overflow-hidden border border-white/20">
-                                        <ReactQuill
-                                            ref={quillRef}
-                                            theme="snow"
-                                            value={content}
-                                            onChange={setContent}
-                                            modules={modules}
-                                            className="h-[500px] pb-12"
-                                            placeholder="Write your fully formatted protocol here..."
-                                        />
+                                    <div className="flex items-center justify-between gap-3">
+                                        <label className="text-xs font-mono text-gray-500 uppercase tracking-wider">Content</label>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => setContentMode(contentMode === 'raw-html' ? 'rich' : 'raw-html')}
+                                                className="border-white/20 text-white hover:bg-white/10 font-mono text-xs"
+                                            >
+                                                {contentMode === 'raw-html' ? 'MODE: RAW HTML' : 'MODE: RICH EDITOR'}
+                                            </Button>
+                                            <input
+                                                ref={docxInputRef}
+                                                type="file"
+                                                accept=".docx"
+                                                className="hidden"
+                                                onChange={handleDocxImport}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => docxInputRef.current?.click()}
+                                                disabled={isImportingDocx}
+                                                className="border-[#39ff14]/40 text-[#39ff14] hover:bg-[#39ff14]/20 font-mono text-xs"
+                                            >
+                                                <FileUp className="w-4 h-4 mr-2" />
+                                                {isImportingDocx ? 'IMPORTING...' : 'IMPORT DOCX'}
+                                            </Button>
+                                        </div>
                                     </div>
+                                    {contentMode === 'raw-html' ? (
+                                        <Textarea
+                                            value={content}
+                                            onChange={(e) => setContent(e.target.value)}
+                                            rows={18}
+                                            className="bg-black/50 border-white/20 focus:border-[#00ccff] focus:ring-0 font-mono"
+                                            placeholder="Paste or import raw HTML content here..."
+                                        />
+                                    ) : (
+                                        <div className="bg-white text-black rounded-lg overflow-hidden border border-white/20">
+                                            <ReactQuill
+                                                ref={quillRef}
+                                                theme="snow"
+                                                value={content}
+                                                onChange={setContent}
+                                                modules={modules}
+                                                className="h-[500px] pb-12"
+                                                placeholder="Write your fully formatted protocol here..."
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">

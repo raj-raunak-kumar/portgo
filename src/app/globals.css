@@ -159,3 +159,19 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+.blog-raw-html code,
+.blog-raw-html kbd,
+.blog-raw-html mark {
+  background-color: rgba(15, 23, 42, 0.92) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 0.375rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.blog-raw-html pre code {
+  background-color: transparent !important;
+  border: 0;
+  padding: 0;
+}
