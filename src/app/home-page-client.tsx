@@ -26,6 +26,27 @@ export default function HomePageClient() {
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (!isMounted) return;
+    const currentUrl = new URL(window.location.href);
+    const sectionId = currentUrl.searchParams.get('section');
+    const targetMode = sectionId ? Object.values(ALIENS).find((alien) => alien.id === sectionId) : null;
+
+    if (targetMode) {
+      setMode(targetMode);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (currentUrl.searchParams.get('menu') === '1') {
+      setIsMenuOpen(true);
+    }
+
+    if (!targetMode && currentUrl.searchParams.get('menu') !== '1') return;
+
+    currentUrl.searchParams.delete('section');
+    currentUrl.searchParams.delete('menu');
+    const normalizedPath = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+    window.history.replaceState({}, '', normalizedPath || '/');
+  }, [isMounted]);
+
   const handleModeChange = (newMode: Alien) => {
     if (newMode.id === mode.id && newMode.id !== 'HUMAN') {
       setIsMenuOpen(false);
