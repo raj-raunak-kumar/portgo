@@ -288,11 +288,15 @@ const fetchFirestorePosts = async (): Promise<FilePost[]> => {
   if (!firebaseProjectId) return [];
 
   const endpoint = `https://firestore.googleapis.com/v1/projects/${firebaseProjectId}/databases/(default)/documents/blogs?pageSize=100`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2500);
 
   try {
     const response = await fetch(endpoint, {
-      cache: 'no-store',
+      next: { revalidate: 120 },
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) return [];
 
@@ -301,6 +305,7 @@ const fetchFirestorePosts = async (): Promise<FilePost[]> => {
       .map(mapFirestoreDocToPost)
       .filter((post): post is FilePost => Boolean(post));
   } catch {
+    clearTimeout(timeout);
     return [];
   }
 };

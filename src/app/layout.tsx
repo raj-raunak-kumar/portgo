@@ -3,6 +3,7 @@ import { Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/components/auth-provider";
+import GlobalMenuButton from '@/components/global-menu-button';
 
 export const metadata: Metadata = {
   title: 'Raj Raunak Kumar',
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className={`${outfit.className} bg-background min-h-screen text-foreground antialiased overflow-x-hidden relative font-body`}>
         <AuthProvider>
           <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-700/20 via-background to-background opacity-60 z-[-1]" />
+          <GlobalMenuButton />
           <div className="relative z-10 w-full">
             {children}
           </div>

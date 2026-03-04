@@ -1,15 +1,20 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ALIENS, Alien } from '@/lib/constants';
-import EnergyBackground from '@/components/energy-background';
-import { ChatbotWidget } from '@/components/chatbot-widget';
 import HeroSection from '@/components/sections/hero-section';
-import AcademicsSection from '@/components/sections/academics-section';
-import TechSection from '@/components/sections/tech-section';
-import TimelineSection from '@/components/sections/timeline-section';
-import ContactSection from '@/components/sections/contact-section';
+
+const EnergyBackground = dynamic(() => import('@/components/energy-background'), { ssr: false });
+const ChatbotWidget = dynamic(
+  () => import('@/components/chatbot-widget').then((module) => module.ChatbotWidget),
+  { ssr: false }
+);
+const AcademicsSection = dynamic(() => import('@/components/sections/academics-section'));
+const TechSection = dynamic(() => import('@/components/sections/tech-section'));
+const TimelineSection = dynamic(() => import('@/components/sections/timeline-section'));
+const ContactSection = dynamic(() => import('@/components/sections/contact-section'));
 
 export default function HomePageClient() {
   const [mode, setMode] = useState<Alien>(ALIENS.HUMAN);

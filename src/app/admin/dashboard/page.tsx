@@ -12,12 +12,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit2, Trash2, LogOut, Check, X, ShieldAlert, Mail, MailOpen, FileUp } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { ChatbotWidget } from '@/components/chatbot-widget';
 import { ContactMessage } from '@/lib/types';
-import { renderAsync } from 'docx-preview';
 import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false }) as any;
+const ChatbotWidget = dynamic(
+    () => import('@/components/chatbot-widget').then((module) => module.ChatbotWidget),
+    { ssr: false }
+);
 
 type BlogPost = {
     id: string;
@@ -196,9 +198,14 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (user) {
             fetchPosts();
+        }
+    }, [user, fetchPosts]);
+
+    useEffect(() => {
+        if (user && activeTab === 'INBOX' && messages.length === 0) {
             fetchMessages();
         }
-    }, [user, fetchMessages, fetchPosts]);
+    }, [activeTab, fetchMessages, messages.length, user]);
 
     const handleLogout = async () => {
         await logout();
@@ -290,6 +297,7 @@ export default function AdminDashboard() {
         try {
             setIsImportingDocx(true);
             toast({ title: "Importing DOCX", description: "Converting document to web content..." });
+            const { renderAsync } = await import('docx-preview');
 
             const arrayBuffer = await file.arrayBuffer();
             const tempContainer = document.createElement('div');

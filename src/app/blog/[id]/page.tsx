@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Calendar, Tag } from 'lucide-react';
-import { getAllFilePosts, getPostById } from '@/lib/posts';
+import { getPostById } from '@/lib/posts';
 
 type PageProps = {
   params: {
@@ -10,10 +10,7 @@ type PageProps = {
   };
 };
 
-export function generateStaticParams() {
-  const posts = getAllFilePosts();
-  return posts.map((post) => ({ id: post.id }));
-}
+export const revalidate = 120;
 
 export default async function BlogPostPage({ params }: PageProps) {
   const post = await getPostById(params.id);
