@@ -293,7 +293,7 @@ const fetchFirestorePosts = async (): Promise<FilePost[]> => {
 
   try {
     const response = await fetch(endpoint, {
-      next: { revalidate: 120 },
+      cache: 'no-store',
       signal: controller.signal,
     });
     clearTimeout(timeout);
