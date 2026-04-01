@@ -53,6 +53,7 @@ export default function AdminDashboard() {
     const [contentMode, setContentMode] = useState<'rich' | 'raw-html'>('rich');
     const [imageUrl, setImageUrl] = useState('');
     const [tags, setTags] = useState('');
+    const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
     const [isImportingDocx, setIsImportingDocx] = useState(false);
 
     const quillRef = useRef<any>(null);
@@ -231,6 +232,9 @@ export default function AdminDashboard() {
                 throw new Error('Post content is too large to store. Reduce document size or images and try again.');
             }
 
+            const publishDate = new Date(date);
+            const dateString = isNaN(publishDate.getTime()) ? new Date().toISOString() : publishDate.toISOString();
+
             const postData = {
                 title,
                 excerpt,
@@ -238,7 +242,7 @@ export default function AdminDashboard() {
                 contentMode,
                 imageUrl,
                 tags,
-                date: new Date().toISOString(),
+                date: dateString,
             };
 
             const legacyPostData = {
@@ -247,7 +251,7 @@ export default function AdminDashboard() {
                 content: normalizedContent,
                 imageUrl,
                 tags,
-                date: new Date().toISOString(),
+                date: dateString,
             };
 
             if (isEditing && currentId) {
@@ -342,6 +346,7 @@ export default function AdminDashboard() {
         setContentMode(inferredMode);
         setImageUrl(post.imageUrl || '');
         setTags(post.tags);
+        try { setDate(new Date(post.date).toISOString().split('T')[0]); } catch { setDate(new Date().toISOString().split('T')[0]); }
         setCurrentId(post.id);
         setIsEditing(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -367,6 +372,7 @@ export default function AdminDashboard() {
         setContentMode('rich');
         setImageUrl('');
         setTags('');
+        setDate(new Date().toISOString().split('T')[0]);
         setIsEditing(false);
         setCurrentId(null);
     };
@@ -536,13 +542,23 @@ export default function AdminDashboard() {
                                     )}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-mono text-gray-500 uppercase tracking-wider">Tags (Comma Separated)</label>
-                                    <Input
-                                        value={tags} onChange={(e) => setTags(e.target.value)}
-                                        className="bg-black/50 border-white/20 focus:border-[#00ccff] focus:ring-0"
-                                        placeholder="AI, Research, System Design"
-                                    />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-mono text-gray-500 uppercase tracking-wider">Tags (Comma Separated)</label>
+                                        <Input
+                                            value={tags} onChange={(e) => setTags(e.target.value)}
+                                            className="bg-black/50 border-white/20 focus:border-[#00ccff] focus:ring-0"
+                                            placeholder="AI, Research, System Design"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-mono text-gray-500 uppercase tracking-wider">Publish Date</label>
+                                        <Input
+                                            type="date"
+                                            value={date} onChange={(e) => setDate(e.target.value)} required
+                                            className="bg-black/50 border-white/20 focus:border-[#00ccff] focus:ring-0 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-4 pt-4 border-t border-white/10">

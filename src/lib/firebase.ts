@@ -8,13 +8,13 @@ import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB5gZQadMZmTgW6TsSMDxwyfTf4SjQE1Co",
-  authDomain: "portfolio-64e4a.firebaseapp.com",
-  projectId: "portfolio-64e4a",
-  storageBucket: "portfolio-64e4a.firebasestorage.app",
-  messagingSenderId: "612753397181",
-  appId: "1:612753397181:web:8e8a34744f0a6f981a2ed4",
-  measurementId: "G-PYQM5BK0NR"
+  apiKey: "AIzaSyDwm9niVdIzaAGn85JlHw85_YbNoAeJpjA",
+  authDomain: "portfolio-23f9c.firebaseapp.com",
+  projectId: "portfolio-23f9c",
+  storageBucket: "portfolio-23f9c.firebasestorage.app",
+  messagingSenderId: "938450685777",
+  appId: "1:938450685777:web:1ceb99ede9ea35d745cd70",
+  measurementId: "G-5W037DW5Q9"
 };
 
 // Initialize Firebase

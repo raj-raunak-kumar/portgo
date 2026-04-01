@@ -15,7 +15,7 @@ export type FilePost = {
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 const supportedPostExtensions = ['.md', '.html', '.htm'];
-const firebaseProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'portfolio-64e4a';
+const firebaseProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'portfolio-23f9c';
 
 const escapeHtml = (input: string) =>
   input
